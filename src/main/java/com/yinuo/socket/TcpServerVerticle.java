@@ -38,6 +38,7 @@ public class TcpServerVerticle extends AbstractVerticle {
     static final ServiceFactory serviceFactory = ServiceFactory.getInstance();
     static final SessionCache sessionCache = SessionCache.getInstance();
     static final VerticleConfig verticleConfig = VerticleConfig.getInstance();
+    W01MessageRepository w01MessageRepository;
 
     public static void main(String[] args) {
         Runner.run(TcpServerVerticle.class);
@@ -45,7 +46,7 @@ public class TcpServerVerticle extends AbstractVerticle {
 
     @Override
     public void start() throws Exception {
-        sessionCache.getJDBCClient(vertx);
+        w01MessageRepository = new W01MessageRepository(sessionCache.getJDBCClient(vertx));
 
         for (int pos = 0; pos < verticleConfig.getInstanceNum(); pos++) {
             createInstance(pos + 1);
@@ -86,7 +87,6 @@ public class TcpServerVerticle extends AbstractVerticle {
                     }
 
                     final String imei = receivedMessage.getImei();
-                    final W01MessageRepository w01MessageRepository = new W01MessageRepository(sessionCache.getJDBCClient(vertx));
 
                     int responseCode = 0;
                     switch (receivedMessage.getEndPointType()) {
